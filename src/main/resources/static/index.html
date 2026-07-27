@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseFit Gym Management Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Vector Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js & html2pdf -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-glow: #f97316;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-danger: #ef4444;
+            --card-bg: rgba(15, 23, 42, 0.50);
+        }
+
+        body { 
+            margin: 0;
+            padding: 0;
+            color: #f1f5f9; 
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-color: #0b0f19;
+        }
+
+        /* 📸 DYNAMIC CAMERA PAN BACKGROUND */
+        .bg-motion-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background-image: linear-gradient(rgba(11, 15, 25, 0.45), rgba(7, 10, 18, 0.60)), 
+                              url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80');
+            background-size: 140% 140%;
+            animation: panCamera 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes panCamera {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 100%; }
+        }
+        
+        .hidden { display: none !important; }
+        .theme-orange { color: #f97316 !important; }
+
+        /* 💎 GLASS FLOATING LOGIN CARD */
+        .glass-login-card {
+            max-width: 420px;
+            margin: 100px auto;
+            padding: 35px;
+            background: rgba(15, 23, 42, 0.45) !important;
+            backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(249, 115, 22, 0.3) !important;
+            text-align: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        /* 🎨 FAINT GLASS CARDS */
+        .bg-card { 
+            background: var(--card-bg) !important; 
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.20) !important; 
+            border-radius: 12px; 
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-orange { 
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); 
+            color: #ffffff !important; 
+            font-weight: bold; 
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-orange:hover { 
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); 
+            transform: translateY(-2px);
+            color: #ffffff !important; 
+        }
+        
+        .sidebar { 
+            width: 290px; 
+            background: rgba(15, 23, 42, 0.55); 
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(255, 255, 255, 0.18); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .owner-img { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #f97316; object-fit: cover; }
+        
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            background: rgba(30, 41, 59, 0.6);
+            color: #f1f5f9 !important;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .nav-btn i { width: 22px; text-align: center; margin-right: 6px; }
+        .nav-btn:hover, .nav-btn.active {
+            background: #f97316;
+            color: #000000 !important;
+            font-weight: bold;
+            border-color: #f97316;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .stat-card { cursor: pointer; transition: transform 0.25s ease; }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-card-total { border-left: 4px solid var(--accent-blue) !important; }
+        .stat-card-expiring { border-left: 4px solid #f59e0b !important; }
+        .stat-card-expired { border-left: 4px solid var(--accent-danger) !important; }
+        .stat-card-revenue { border-left: 4px solid var(--accent-green) !important; }
+
+        small, .text-muted, .text-white-50 { color: #e2e8f0 !important; }
+        label { font-size: 13px; color: #ffffff !important; font-weight: 600; margin-bottom: 6px; display: block; }
+
+        .form-control, .form-select { 
+            background-color: rgba(15, 23, 42, 0.65) !important; 
+            color: #ffffff !important; 
+            border: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            border-radius: 8px;
+            padding: 10px 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        table { color: #fff !important; }
+        th { 
+            background-color: rgba(15, 23, 42, 0.85) !important; 
+            color: #f97316 !important; 
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .gym-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+        .gym-gallery img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.2); }
+        .diet-btn { background: rgba(30, 41, 59, 0.7); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 6px; font-weight: bold; }
+        .diet-btn.active { background: #f97316; color: #000; border-color: #f97316; }
+
+        .receipt-card { 
+            border: 2px solid #f97316; 
+            background-color: rgba(15, 23, 42, 0.70) !important; 
+            backdrop-filter: blur(20px);
+            padding: 25px; 
+            border-radius: 12px; 
+            position: relative; 
+            color: #ffffff !important;
+        }
+        .workout-card { background: rgba(30, 41, 59, 0.65); border-left: 4px solid #f97316; border-radius: 8px; padding: 18px; margin-bottom: 15px; backdrop-filter: blur(15px); }
+        .workout-list { color: #f8fafc !important; font-size: 14px; font-weight: 500; }
+        .workout-list li { margin-bottom: 6px; }
+        .workout-list li span { color: #f97316; font-weight: bold; }
+        .calc-box { background: rgba(15, 23, 42, 0.60); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 20px; backdrop-filter: blur(15px); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-motion-layer"></div>
+
+    <!-- 1. FLOATING GLASS LOGIN SCREEN -->
+    <div id="login-screen" class="glass-login-card">
+        <h2 style="color: #f97316; margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">
+            <i class="fa-solid fa-dumbbell me-2"></i>PULSEFIT GYM
+        </h2>
+        <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 25px;">Management Portal Login</p>
+
+        <form id="loginForm" onsubmit="performLogin(event); return false;">
+            <div style="margin-bottom: 18px; text-align: left;">
+                <label><i class="fa-solid fa-user me-1"></i> Admin Name / Member Email</label>
+                <input type="text" id="login-user" placeholder="e.g. bhavesh or member@gmail.com" required 
+                       style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; box-sizing: border-box;">
+            </div>
+
+            <div style="margin-bottom: 25px; text-align: left;">
+                <label><i class="fa-solid fa-lock me-1"></i> Password</label>
+                <input type="password" id="login-pass" placeholder="Enter Password" required 
+                       style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; box-sizing: border-box;">
+            </div>
+
+            <button type="submit" class="btn btn-orange w-100 py-2 fs-6">
+                <i class="fa-solid fa-right-to-bracket me-2"></i>LOGIN TO PORTAL
+            </button>
+        </form>
+    </div>
+    
+    <!-- 2. MAIN APP PORTAL -->
+    <div id="app-screen" class="d-flex hidden">
+        
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar d-flex flex-column justify-content-between">
+            <div>
+                <div class="text-center mb-3">
+                    <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=300&q=80" class="owner-img mb-2" alt="Owner Profile">
+                    <h5 class="theme-orange m-0 fw-bold">PULSEFIT GYM</h5>
+                    <small class="text-white-50 d-block mt-1">Owner: Bhavesh Patil</small>
+                </div>
+
+                <div class="bg-dark p-2 rounded mb-3 border border-secondary text-center small" style="background: rgba(0,0,0,0.5) !important;">
+                    <i class="fa-regular fa-calendar-days me-1 text-warning"></i> <span id="clock-display" class="theme-orange font-monospace"></span>
+                </div>
+
+                <button onclick="location.reload()" class="btn btn-outline-danger btn-sm w-100 mb-3">
+                    <i class="fa-solid fa-power-off me-1"></i> Logout
+                </button>
+
+                <div id="admin-menu" class="hidden">
+                    <p class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 11px;">Admin Navigation</p>
+                    <button class="nav-btn" onclick="showSection('add-user-section')"><i class="fa-solid fa-user-plus"></i> Add Member / Subscription</button>
+                    <button class="nav-btn" onclick="showSection('receipt-section')"><i class="fa-solid fa-file-invoice-dollar"></i> Receipt View</button>
+                    <button class="nav-btn" onclick="showSection('charts-section')"><i class="fa-solid fa-chart-pie"></i> All Charts & Members Table</button>
+                </div>
+            </div>
+            
+            <div class="text-center text-white-50 small">
+                <hr class="border-secondary my-2">
+                PulseFit OS v2.0
+            </div>
+        </div>
+
+        <!-- MAIN VIEW PORT -->
+        <div class="flex-grow-1 p-4 overflow-auto">
+            
+            <!-- ADMIN VIEW -->
+            <div id="admin-view" class="hidden">
+                <h3 class="theme-orange mb-3"><i class="fa-solid fa-sliders me-2"></i>Admin Control Panel</h3>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="bg-card p-3 stat-card stat-card-total" onclick="quickFilterStatus('ALL')">
+                            <small class="text-white-50 d-block mb-1"><i class="fa-solid fa-users me-1 text-primary"></i> Total Registered</small>
+                            <h2 id="stat-total" class="theme-orange m-0 fw-bold">0</h2>
+                            <small class="text-white-50" style="font-size: 11px;">Click to view all</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-card p-3 stat-card stat-card-expiring" onclick="quickFilterStatus('EXPIRING_SOON')">
+                            <small class="text-warning fw-bold d-block mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Expiring in 7 Days</small>
+                            <h2 id="stat-expiring" class="text-warning m-0 fw-bold">0</h2>
+                            <small class="text-warning" style="font-size: 11px;">Click to filter</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-card p-3 stat-card stat-card-expired" onclick="quickFilterStatus('EXPIRED')">
+                            <small class="text-danger fw-bold d-block mb-1"><i class="fa-solid fa-circle-xmark me-1"></i> Expired Members</small>
+                            <h2 id="stat-expired" class="text-danger m-0 fw-bold">0</h2>
+                            <small class="text-danger" style="font-size: 11px;">Click to filter</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-card p-3 stat-card stat-card-revenue">
+                            <small class="text-white-50 d-block mb-1"><i class="fa-solid fa-indian-rupee-sign me-1 text-success"></i> Total Revenue</small>
+                            <h2 id="stat-revenue" class="text-success m-0 fw-bold">₹0</h2>
+                            <small class="text-success" style="font-size: 11px;">All-time Collections</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-3 mb-4 border border-warning" id="front-action-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="theme-orange m-0 fw-bold"><i class="fa-solid fa-bolt me-2 text-warning"></i>Immediate Action Needed (Expiring Soon & Expired Members)</h6>
+                        <span class="badge bg-warning text-dark font-monospace" id="action-count-badge">0 Members</span>
+                    </div>
+                    <div id="front-action-list" class="small text-white-50">
+                        <p class="m-0 text-white-50">Checking member statuses...</p>
+                    </div>
+                </div>
+
+                <div id="add-user-section" class="bg-card p-4 mb-4">
+                    <h5 class="theme-orange mb-3"><i class="fa-solid fa-address-card me-2"></i>Register New Member & Subscription</h5>
+                    <form id="member-reg-form" onsubmit="saveMember(event); return false;">
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end border-secondary pe-md-4">
+                                <h6 class="text-white border-bottom border-secondary pb-2 mb-3">1. Personal Details</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label>Auto Roll Series</label>
+                                        <input type="text" id="reg-roll" class="form-control" value="PULSE-AUTO" readonly style="opacity: 0.8;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Full Name / Username</label>
+                                        <input type="text" id="reg-name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Email Address</label>
+                                        <input type="email" id="reg-email" class="form-control" placeholder="e.g. rahul@gmail.com" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Phone Number</label>
+                                        <input type="text" id="reg-phone" class="form-control" placeholder="e.g. 9876543210" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label>Full Address</label>
+                                        <input type="text" id="reg-address" class="form-control" placeholder="e.g. Flat 102, City Heights" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Gender</label>
+                                        <select id="reg-gender" class="form-select">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Blood Group</label>
+                                        <select id="reg-blood" class="form-select">
+                                            <option value="O+">O+</option>
+                                            <option value="A+">A+</option>
+                                            <option value="B+">B+</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 ps-md-4">
+                                <h6 class="text-white border-bottom border-secondary pb-2 mb-3">2. Subscription Plan & Payment</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label>Select Subscription Plan</label>
+                                        <select id="reg-plan" class="form-select" onchange="syncPrice()">
+                                            <option value="Monthly">Monthly (₹1200)</option>
+                                            <option value="Quarterly">Quarterly (₹3200)</option>
+                                            <option value="Half-Yearly">Half-Yearly (₹5500)</option>
+                                            <option value="Yearly">Yearly (₹9900)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Price Rate (₹)</label>
+                                        <input type="number" id="reg-price" class="form-control" value="1200" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Payment Mode</label>
+                                        <select id="reg-pay" class="form-select">
+                                            <option value="Online">Online / UPI</option>
+                                            <option value="Cash">Cash</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mt-4 pt-3">
+                                        <button type="submit" class="btn btn-orange w-100 py-2 fs-6"><i class="fa-solid fa-check-circle me-2"></i>SUBMIT & REGISTER MEMBER</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="receipt-section" class="bg-card p-4 mb-4 hidden">
+                    <h5 class="theme-orange mb-3"><i class="fa-solid fa-receipt me-2"></i>Recent Registration Receipt</h5>
+                    <div id="receipt-box" class="p-3 border border-secondary rounded" style="background: rgba(15,23,42,0.6);">
+                        <p class="text-white-50 mb-0">No recent registration yet. Register a member to see the receipt here.</p>
+                    </div>
+                </div>
+
+                <div id="charts-section" class="bg-card p-4 mb-4 hidden">
+                    <h5 class="theme-orange mb-3"><i class="fa-solid fa-chart-column me-2"></i>Real-time Subscriptions Chart</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-8 mx-auto">
+                            <canvas id="revenueChart" style="max-height: 260px;"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="theme-orange m-0"><i class="fa-solid fa-table-list me-2"></i>Registered Members Database</h5>
+                        <button onclick="exportToCSV()" class="btn btn-sm btn-success fw-bold"><i class="fa-solid fa-file-excel me-1"></i> Export to Excel</button>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <input type="text" id="search-input" class="form-control" placeholder="🔍 Search name, roll, email..." onkeyup="filterMembersTable()">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filter-plan" class="form-select" onchange="filterMembersTable()">
+                                <option value="ALL">All Plans</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Half-Yearly">Half-Yearly</option>
+                                <option value="Yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filter-status" class="form-select" onchange="filterMembersTable()">
+                                <option value="ALL">All Status</option>
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="EXPIRING_SOON">EXPIRING SOON</option>
+                                <option value="EXPIRED">EXPIRED</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-bordered align-middle text-center" style="font-size: 13px; background: transparent;">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Gender/Blood</th>
+                                    <th>Plan</th>
+                                    <th>Price</th>
+                                    <th>Pay Mode</th>
+                                    <th>Expiry</th>
+                                    <th>Status Alert</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="member-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBER / USER VIEW -->
+            <div id="user-view" class="hidden">
+                <div class="bg-card p-4 mb-4 text-center">
+                    <h2 class="theme-orange" id="u-welcome">Welcome Member</h2>
+                    <p class="text-white-50 mb-0">PulseFit Gym Access & Fitness Portal</p>
+                </div>
+
+                <div class="receipt-card mb-4" id="printable-receipt">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-3">
+                        <div>
+                            <h3 class="theme-orange fw-bold m-0"><i class="fa-solid fa-dumbbell me-2"></i>PULSEFIT GYM OFFICIAL RECEIPT</h3>
+                            <small class="text-white-50">Fitness Center & Strength Training Station</small>
+                        </div>
+                        <div class="text-end">
+                            <span id="u-reg-datetime" class="badge bg-secondary p-2 font-monospace d-block mb-1"></span>
+                            <button onclick="downloadReceiptPDF()" class="btn btn-sm btn-orange d-print-none"><i class="fa-solid fa-print me-1"></i> Print / Download PDF</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-bordered align-middle mb-0" style="background: transparent;">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 20%;">Roll Number</th>
+                                    <td style="width: 30%;" id="u-roll" class="theme-orange fw-bold fs-5"></td>
+                                    <th style="width: 20%;">Full Name</th>
+                                    <td style="width: 30%;" id="u-name" class="fw-bold fs-5"></td>
+                                </tr>
+                                <tr>
+                                    <th>Email Address</th>
+                                    <td id="u-email"></td>
+                                    <th>Phone Number</th>
+                                    <td id="u-phone"></td>
+                                </tr>
+                                <tr>
+                                    <th>Full Address</th>
+                                    <td id="u-address"></td>
+                                    <th>Gender / Blood Group</th>
+                                    <td><span id="u-gender"></span> / <span id="u-blood" class="text-danger fw-bold"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Subscription Plan</th>
+                                    <td id="u-plan" class="fw-bold theme-orange"></td>
+                                    <th>Amount Paid</th>
+                                    <td id="u-price" class="text-success fw-bold fs-5"></td>
+                                </tr>
+                                <tr>
+                                    <th>Payment Mode</th>
+                                    <td id="u-pay"></td>
+                                    <th>Valid Till (Expiry)</th>
+                                    <td id="u-expiry" class="text-warning fw-bold"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-card p-4 mb-4">
+                    <h4 class="theme-orange mb-2"><i class="fa-solid fa-building me-2"></i>Gym Facilities & Interior Showcase</h4>
+                    <p class="text-white-50 small">High-performance strength training racks, cardio setups, and steam room facilities.</p>
+                    <div class="gym-gallery">
+                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800" alt="Gym Workout Zone">
+                        <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=800" alt="Weights Rack">
+                        <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800" alt="Cardio Zone">
+                    </div>
+                </div>
+
+                <div class="bg-card p-4 mb-4">
+                    <h4 class="theme-orange mb-3"><i class="fa-solid fa-utensils me-2"></i>Customized 6-Day Fitness Diet Plan</h4>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6 d-flex">
+                            <button class="diet-btn active me-2 w-50" id="tabMen" onclick="switchGender('men')"><i class="fa-solid fa-mars me-1"></i> Men Plan</button>
+                            <button class="diet-btn me-2 w-50" id="tabWomen" onclick="switchGender('women')"><i class="fa-solid fa-venus me-1"></i> Women Plan</button>
+                        </div>
+                        <div class="col-md-6 d-flex">
+                            <button class="diet-btn active me-2 w-50" id="tabNonVeg" onclick="switchDietType('nonveg')"><i class="fa-solid fa-drumstick-bite me-1"></i> Non-Vegetarian</button>
+                            <button class="diet-btn w-50" id="tabVeg" onclick="switchDietType('veg')"><i class="fa-solid fa-carrot me-1"></i> Vegetarian</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-bordered text-center align-middle" style="background: transparent;">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Breakfast</th>
+                                    <th>Lunch</th>
+                                    <th>Post-Workout</th>
+                                    <th>Dinner</th>
+                                </tr>
+                            </thead>
+                            <tbody id="diet-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-card p-4 mb-4">
+                    <h4 class="theme-orange mb-3"><i class="fa-solid fa-person-running me-2"></i>6-Day Push-Pull-Legs Workout Plan</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="workout-card">
+                                <h5 class="theme-orange fw-bold"><i class="fa-solid fa-fire me-2"></i>Mon & Thu: PUSH</h5>
+                                <small class="text-white-50 d-block mb-2">(Chest, Shoulder, Triceps)</small>
+                                <hr class="border-secondary my-2">
+                                <ul class="workout-list ps-3 mb-0">
+                                    <li>Bench Press — <span>4 Sets x 8-10 Reps</span></li>
+                                    <li>Incline DB Press — <span>3 Sets x 10 Reps</span></li>
+                                    <li>Overhead Press — <span>4 Sets x 10 Reps</span></li>
+                                    <li>Lateral Raises — <span>4 Sets x 15 Reps</span></li>
+                                    <li>Triceps Pushdowns — <span>4 Sets x 12 Reps</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="workout-card">
+                                <h5 class="theme-orange fw-bold"><i class="fa-solid fa-hand-back-fist me-2"></i>Tue & Fri: PULL</h5>
+                                <small class="text-white-50 d-block mb-2">(Back, Biceps, Rear Delt)</small>
+                                <hr class="border-secondary my-2">
+                                <ul class="workout-list ps-3 mb-0">
+                                    <li>Lat Pulldowns — <span>4 Sets x 10 Reps</span></li>
+                                    <li>Bent-Over Rows — <span>4 Sets x 8 Reps</span></li>
+                                    <li>Face Pulls — <span>4 Sets x 15 Reps</span></li>
+                                    <li>Barbell Curls — <span>4 Sets x 12 Reps</span></li>
+                                    <li>Hammer Curls — <span>3 Sets x 12 Reps</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="workout-card">
+                                <h5 class="theme-orange fw-bold"><i class="fa-solid fa-child me-2"></i>Wed & Sat: LEGS & ABS</h5>
+                                <small class="text-white-50 d-block mb-2">(Quads, Hamstrings, Core)</small>
+                                <hr class="border-secondary my-2">
+                                <ul class="workout-list ps-3 mb-0">
+                                    <li>Barbell Squats — <span>4 Sets x 8 Reps</span></li>
+                                    <li>Leg Press — <span>4 Sets x 12 Reps</span></li>
+                                    <li>Leg Curls — <span>4 Sets x 12 Reps</span></li>
+                                    <li>Calf Raises — <span>4 Sets x 15 Reps</span></li>
+                                    <li>Leg Raises / Crunches — <span>4 Sets x 15 Reps</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-4 mb-4">
+                    <h4 class="theme-orange mb-3"><i class="fa-solid fa-calculator me-2"></i>Fitness, BMI & Nutrition Calculator</h4>
+                    <div class="calc-box">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label>Weight (in kg)</label>
+                                <input type="number" id="bmi-weight" class="form-control" placeholder="e.g. 60">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Height (in cm)</label>
+                                <input type="number" id="bmi-height" class="form-control" placeholder="e.g. 165">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button onclick="calculateBMI()" class="btn btn-orange w-100 py-2"><i class="fa-solid fa-calculator me-2"></i>CALCULATE MY FITNESS</button>
+                            </div>
+                        </div>
+
+                        <div id="bmi-result-box" class="mt-4 hidden p-3 rounded border border-secondary" style="background: rgba(15,23,42,0.7);">
+                            <div class="row text-center g-3 align-items-center">
+                                <div class="col-md-3 border-end border-secondary py-2">
+                                    <span class="text-warning fw-bold small d-block mb-1"><i class="fa-solid fa-square-poll-vertical me-1"></i> BMI Score</span>
+                                    <h3 id="bmi-val" class="theme-orange fw-bold m-0"></h3>
+                                    <span id="bmi-status" class="badge mt-1"></span>
+                                </div>
+                                <div class="col-md-3 border-end border-secondary py-2">
+                                    <span class="text-warning fw-bold small d-block mb-1"><i class="fa-solid fa-weight-scale me-1"></i> Ideal Weight Range</span>
+                                    <h4 id="ideal-weight" class="text-white fw-bold m-0 mt-1"></h4>
+                                </div>
+                                <div class="col-md-3 border-end border-secondary py-2">
+                                    <span class="text-warning fw-bold small d-block mb-1"><i class="fa-solid fa-fire me-1"></i> Maintenance Calories</span>
+                                    <h4 id="daily-calories" class="text-info fw-bold m-0 mt-1"></h4>
+                                </div>
+                                <div class="col-md-3 py-2">
+                                    <span class="text-warning fw-bold small d-block mb-1"><i class="fa-solid fa-egg me-1"></i> Daily Protein Goal</span>
+                                    <h4 id="daily-protein" class="text-success fw-bold m-0 mt-1"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- EDIT MEMBER MODAL -->
+    <div class="modal fade" id="editMemberModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title theme-orange"><i class="fa-solid fa-user-pen me-2"></i>Edit Member Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-member-form">
+                        <input type="hidden" id="edit-id">
+                        <div class="mb-2"><label>Full Name</label><input type="text" id="edit-name" class="form-control" required></div>
+                        <div class="mb-2"><label>Email</label><input type="email" id="edit-email" class="form-control" required></div>
+                        <div class="mb-2"><label>Phone</label><input type="text" id="edit-phone" class="form-control" required></div>
+                        <div class="mb-2"><label>Address</label><input type="text" id="edit-address" class="form-control" required></div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6"><label>Gender</label><select id="edit-gender" class="form-select"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                            <div class="col-6"><label>Blood Group</label><select id="edit-blood" class="form-select"><option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option><option value="O-">O-</option></select></div>
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6"><label>Plan</label><select id="edit-plan" class="form-select"><option value="Monthly">Monthly</option><option value="Quarterly">Quarterly</option><option value="Half-Yearly">Half-Yearly</option><option value="Yearly">Yearly</option></select></div>
+                            <div class="col-6"><label>Payment Mode</label><select id="edit-pay" class="form-select"><option value="Online">Online</option><option value="Cash">Cash</option></select></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-orange" onclick="submitEditMember()"><i class="fa-solid fa-floppy-disk me-1"></i> Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOTSTRAP BUNDLE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let chartInstance = null;
+        let currentGender = 'men';
+        let currentDietType = 'nonveg';
+        let allMembersData = [];
+
+        const dietDatabase = {
+            men: {
+                nonveg: [
+                    { day: "Mon", b: "4 Eggs + Oats + Banana", l: "Chicken Breast (200g) + 2 Cups Rice", p: "1 Scoop Whey + Creatine + Fruit", d: "Fish / Chicken Curry + 3 Roti" },
+                    { day: "Tue", b: "Egg Omelette + Toast + Milk", l: "Chicken Rice Bowl + Salad", p: "1 Scoop Whey + Peanut Toast", d: "Egg Curry + 3 Chapatis" },
+                    { day: "Wed", b: "Boiled Eggs (4 Whole) + Juice", l: "Mutton/Chicken Pulav + Curd", p: "1 Scoop Whey + Creatine", d: "Grilled Fish + Brown Rice" },
+                    { day: "Thu", b: "Oats Smoothie + 3 Egg Whites", l: "Chicken Tikka + Rice + Salad", p: "1 Scoop Whey + Dates", d: "Chicken/Soya Curry + Roti" },
+                    { day: "Fri", b: "Egg Bhurji + Whole Wheat Bread", l: "Fish Curry + Rice + Sprouts", p: "1 Scoop Whey + Creatine", d: "Egg Curry + Roti + Salad" },
+                    { day: "Sat", b: "Eggs + Pancakes + Honey", l: "Chicken Biryani / Roasted Chicken", p: "1 Scoop Whey + Banana Shake", d: "Grilled Chicken + Veggies" }
+                ],
+                veg: [
+                    { day: "Mon", b: "Paneer Paratha + Curd", l: "Dal Makhani + Paneer (150g) + Rice", p: "1 Scoop Whey + Creatine + Banana", d: "Tofu Curry + 3 Chapatis" },
+                    { day: "Tue", b: "Moong Dal Cheela + Milk", l: "Rajma Chawal + Green Salad", p: "1 Scoop Whey + Peanut Toast", d: "Soya Chunks Curry + Roti" },
+                    { day: "Wed", b: "Oats Smoothie + Almonds", l: "Paneer Pulav + Curd + Salad", p: "1 Scoop Whey + Creatine", d: "Mix Dal + Chapati + Sprouts" },
+                    { day: "Thu", b: "Sprouts Salad + Brown Bread", l: "Chole Bhature (Moderate) / Chole Rice", p: "1 Scoop Whey + Dates", d: "Paneer Bhurji + Roti" },
+                    { day: "Fri", b: "Nutella Oats + Whole Milk", l: "Kadhi Pakoda + Rice + Salad", p: "1 Scoop Whey + Creatine", d: "Tofu Stir Fry + Roti" },
+                    { day: "Sat", b: "Paneer Sandwich + Juice", l: "Veg Biryani + Paneer Tikka", p: "1 Scoop Whey + Banana Shake", d: "Khichdi + Curd + Salad" }
+                ]
+            },
+            women: {
+                nonveg: [
+                    { day: "Mon", b: "2 Egg Whites + Oats + Apple", l: "Chicken Breast (100g) + 1 Cup Rice", p: "1 Scoop Whey + Berries", d: "Grilled Fish + Cucumber Salad" },
+                    { day: "Tue", b: "Egg Omelette + Green Tea", l: "Chicken Salad Wrap", p: "1 Scoop Whey in Water", d: "2 Egg Whites Curry + 1 Roti" },
+                    { day: "Wed", b: "Boiled Eggs (2) + Brown Toast", l: "Grilled Chicken + Veggies", p: "1 Scoop Whey + Fruit", d: "Fish Soup / Boiled Chicken" },
+                    { day: "Thu", b: "Oats Smoothie (Water-based)", l: "Chicken Pulav (Light)", p: "1 Scoop Whey + Almonds", d: "Soya/Chicken Salad" },
+                    { day: "Fri", b: "Egg Bhurji (2 Whites)", l: "Fish Rice Bowl", p: "1 Scoop Whey", d: "Grilled Chicken + Soup" },
+                    { day: "Sat", b: "Poached Eggs + Toast", l: "Chicken Wrap + Salad", p: "1 Scoop Whey Shake", d: "Boiled Egg Salad" }
+                ],
+                veg: [
+                    { day: "Mon", b: "Oats in Almond Milk + Apple", l: "Paneer (80g) + Brown Rice + Salad", p: "1 Scoop Whey + Seeds", d: "Tofu & Veggie Soup" },
+                    { day: "Tue", b: "Moong Dal Cheela + Green Tea", l: "Curd Rice + Sprouts", p: "1 Scoop Whey in Water", d: "Soya Chunks Salad" },
+                    { day: "Wed", b: "Sprouts Salad + Juice", l: "Dal + 1 Chapati + Sabzi", p: "1 Scoop Whey + Almonds", d: "Paneer Bhurji + Salad" },
+                    { day: "Thu", b: "Oats & Chia Seed Bowl", l: "Rajma Rice (Light)", p: "1 Scoop Whey + Dates", d: "Mix Veg Soup + Tofu" },
+                    { day: "Fri", b: "Paneer Toast (Light)", l: "Kadhi + Rice + Salad", p: "1 Scoop Whey", d: "Soya Stir Fry" },
+                    { day: "Sat", b: "Fruit Bowl + Nuts", l: "Veg Pulav + Curd", p: "1 Scoop Whey Shake", d: "Khichdi + Curd" }
+                ]
+            }
+        };
+
+        setInterval(() => {
+            const clockEl = document.getElementById('clock-display');
+            if (clockEl) clockEl.innerText = new Date().toLocaleString();
+        }, 1000);
+
+        function showSection(sectionId) {
+            document.getElementById('add-user-section').classList.add('hidden');
+            document.getElementById('receipt-section').classList.add('hidden');
+            document.getElementById('charts-section').classList.add('hidden');
+
+            const selected = document.getElementById(sectionId);
+            if (selected) selected.classList.remove('hidden');
+        }
+
+        function switchGender(g) {
+            currentGender = g;
+            document.getElementById('tabMen').classList.toggle('active', g === 'men');
+            document.getElementById('tabWomen').classList.toggle('active', g === 'women');
+            renderDietTable();
+        }
+
+        function switchDietType(d) {
+            currentDietType = d;
+            document.getElementById('tabNonVeg').classList.toggle('active', d === 'nonveg');
+            document.getElementById('tabVeg').classList.toggle('active', d === 'veg');
+            renderDietTable();
+        }
+
+        function renderDietTable() {
+            const list = dietDatabase[currentGender][currentDietType];
+            const tbody = document.getElementById('diet-table-body');
+            tbody.innerHTML = '';
+
+            list.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${item.day}</b></td>
+                        <td>${item.b}</td>
+                        <td>${item.l}</td>
+                        <td>${item.p}</td>
+                        <td>${item.d}</td>
+                    </tr>
+                `;
+            });
+        }
+        renderDietTable(); 
+
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('bmi-weight').value);
+            const height = parseFloat(document.getElementById('bmi-height').value);
+
+            if (!weight || !height || weight <= 0 || height <= 0) {
+                alert("Please enter valid Weight and Height!");
+                return;
+            }
+
+            const heightInMeters = height / 100;
+            const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+
+            const minIdealWeight = (18.5 * heightInMeters * heightInMeters).toFixed(1);
+            const maxIdealWeight = (24.9 * heightInMeters * heightInMeters).toFixed(1);
+            const approxCalories = Math.round(weight * 30); 
+            const proteinTarget = Math.round(weight * 1.8); 
+
+            document.getElementById('bmi-result-box').classList.remove('hidden');
+            document.getElementById('bmi-val').innerText = bmi;
+            document.getElementById('ideal-weight').innerText = `${minIdealWeight} - ${maxIdealWeight} kg`;
+            document.getElementById('daily-calories').innerText = `${approxCalories} kcal`;
+            document.getElementById('daily-protein').innerText = `${proteinTarget}g / day`;
+
+            const bmiStatus = document.getElementById('bmi-status');
+            if (bmi < 18.5) {
+                bmiStatus.innerText = "Underweight";
+                bmiStatus.className = "badge bg-warning text-dark";
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                bmiStatus.innerText = "Fit / Ideal Weight";
+                bmiStatus.className = "badge bg-success";
+            } else {
+                bmiStatus.innerText = "Overweight";
+                bmiStatus.className = "badge bg-danger";
+            }
+        }
+
+        function syncPrice() {
+            const plan = document.getElementById('reg-plan').value;
+            const rates = { 'Monthly': 1200, 'Quarterly': 3200, 'Half-Yearly': 5500, 'Yearly': 9900 };
+            document.getElementById('reg-price').value = rates[plan] || 0;
+        }
+
+        async function performLogin(event) {
+            if (event) event.preventDefault();
+            
+            const username = document.getElementById('login-user').value;
+            const password = document.getElementById('login-pass').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+
+                    if (data.role === 'ADMIN') {
+                        document.getElementById('admin-view').classList.remove('hidden');
+                        document.getElementById('admin-menu').classList.remove('hidden');
+                        loadAdminDashboard();
+                    } else {
+                        const m = data.member;
+                        document.getElementById('user-view').classList.remove('hidden');
+                        
+                        document.getElementById('u-welcome').innerText = "Welcome, " + (m.username || 'Member');
+                        document.getElementById('u-roll').innerText = m.rollNo || 'N/A';
+                        document.getElementById('u-name').innerText = m.username || 'N/A';
+                        document.getElementById('u-email').innerText = m.email || 'N/A';
+                        document.getElementById('u-phone').innerText = m.phone || 'N/A';
+                        document.getElementById('u-address').innerText = m.address || 'N/A';
+                        document.getElementById('u-gender').innerText = m.gender || 'N/A';
+                        document.getElementById('u-blood').innerText = m.bloodGroup || 'N/A';
+                        document.getElementById('u-plan').innerText = m.subscriptionPlan || 'N/A';
+                        document.getElementById('u-price').innerText = "₹" + (m.price || 0);
+                        document.getElementById('u-pay').innerText = m.paymentMode || 'N/A';
+                        document.getElementById('u-expiry').innerText = m.expiryDate || 'N/A';
+
+                        const now = new Date();
+                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                        document.getElementById('u-reg-datetime').innerText = "🗓️ " + now.toLocaleDateString('en-US', options);
+                    }
+                } else {
+                    alert("Invalid Credentials! Admin default: bhavesh / 1234");
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                alert("Backend connection failed! Make sure Spring Boot is running.");
+            }
+        }
+
+        async function loadAdminDashboard() {
+            try {
+                const membersRes = await fetch('/api/members');
+                allMembersData = await membersRes.json();
+
+                const today = new Date();
+                let expiringCount = 0;
+                let expiredCount = 0;
+                let totalRevenue = 0;
+                let actionNeededMembers = [];
+
+                allMembersData.forEach(m => {
+                    totalRevenue += m.price || 0;
+                    if (m.expiryDate) {
+                        const expDate = new Date(m.expiryDate);
+                        const daysLeft = Math.ceil((expDate - today) / (1000 * 3600 * 24));
+                        m.daysLeftCalc = daysLeft;
+
+                        if (daysLeft < 0) {
+                            m.calcStatus = 'EXPIRED';
+                            expiredCount++;
+                            actionNeededMembers.push(m);
+                        } else if (daysLeft <= 7) {
+                            m.calcStatus = 'EXPIRING_SOON';
+                            expiringCount++;
+                            actionNeededMembers.push(m);
+                        } else {
+                            m.calcStatus = 'ACTIVE';
+                        }
+                    } else {
+                        m.calcStatus = 'ACTIVE';
+                    }
+                });
+
+                document.getElementById('stat-total').innerText = allMembersData.length;
+                document.getElementById('stat-expiring').innerText = expiringCount;
+                document.getElementById('stat-expired').innerText = expiredCount;
+                document.getElementById('stat-revenue').innerText = "₹" + totalRevenue;
+
+                const frontList = document.getElementById('front-action-list');
+                document.getElementById('action-count-badge').innerText = `${actionNeededMembers.length} Members`;
+
+                if (actionNeededMembers.length === 0) {
+                    frontList.innerHTML = `<span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> All member subscriptions are active!</span>`;
+                } else {
+                    frontList.innerHTML = '';
+                    actionNeededMembers.slice(0, 5).forEach(m => {
+                        let statusTxt = m.daysLeftCalc < 0 
+                            ? `<span class="text-danger fw-bold">Expired ${Math.abs(m.daysLeftCalc)}d ago</span>` 
+                            : `<span class="text-warning fw-bold">Expires in ${m.daysLeftCalc} days</span>`;
+
+                        frontList.innerHTML += `
+                            <div class="d-flex justify-content-between align-items-center p-2 rounded mb-2 border border-secondary" style="background: rgba(15,23,42,0.6);">
+                                <div>
+                                    <b class="text-white">${m.username}</b> (${m.rollNo || 'No Roll'}) — ${statusTxt}
+                                    <small class="d-block text-white-50">Expiry: ${m.expiryDate}</small>
+                                </div>
+                                <div>
+                                    <button onclick="sendReminderEmail('${m.email}', '${m.username}', ${m.daysLeftCalc}, '${m.expiryDate}')" class="btn btn-sm btn-outline-warning py-1 px-2 me-1"><i class="fa-solid fa-envelope"></i> Mail</button>
+                                    <button onclick="sendWhatsAppReminder('${m.phone}', '${m.username}', ${m.daysLeftCalc}, '${m.expiryDate}')" class="btn btn-sm btn-success py-1 px-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                renderMembersTable(allMembersData);
+
+                let planCounts = { 'Monthly': 0, 'Quarterly': 0, 'Half-Yearly': 0, 'Yearly': 0 };
+                allMembersData.forEach(m => {
+                    if (planCounts[m.subscriptionPlan] !== undefined) planCounts[m.subscriptionPlan]++;
+                });
+
+                renderChart(planCounts);
+
+            } catch (err) {
+                console.error("Dashboard Load Error:", err);
+            }
+        }
+
+        function renderMembersTable(data) {
+            const tbody = document.getElementById('member-table-body');
+            tbody.innerHTML = '';
+            const today = new Date();
+
+            data.forEach(m => {
+                let statusBadge = '';
+                let daysLeft = 999;
+
+                if (m.expiryDate) {
+                    const expDate = new Date(m.expiryDate);
+                    daysLeft = Math.ceil((expDate - today) / (1000 * 3600 * 24));
+
+                    if (daysLeft < 0) {
+                        statusBadge = `<span class="badge bg-danger p-2 rounded-pill"><i class="fa-solid fa-triangle-exclamation me-1"></i> EXPIRED (${Math.abs(daysLeft)}d ago)</span>`;
+                    } else if (daysLeft <= 7) {
+                        statusBadge = `<span class="badge bg-warning text-dark p-2 rounded-pill"><i class="fa-solid fa-clock me-1"></i> EXPIRES IN ${daysLeft} DAYS</span>`;
+                    } else {
+                        statusBadge = `<span class="badge bg-success p-2 rounded-pill"><i class="fa-solid fa-circle-check me-1"></i> ACTIVE (${daysLeft}d left)</span>`;
+                    }
+                } else {
+                    statusBadge = `<span class="badge bg-success p-2 rounded-pill"><i class="fa-solid fa-circle-check me-1"></i> ACTIVE</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${m.rollNo}</b></td>
+                        <td class="fw-bold theme-orange">${m.username || 'N/A'}</td>
+                        <td>${m.email}</td>
+                        <td>${m.phone || 'N/A'}</td>
+                        <td>${m.address || 'N/A'}</td>
+                        <td>${m.gender || 'N/A'} / ${m.bloodGroup || 'N/A'}</td>
+                        <td><b>${m.subscriptionPlan || 'N/A'}</b></td>
+                        <td class="text-success fw-bold">₹${m.price || 0}</td>
+                        <td>${m.paymentMode || 'N/A'}</td>
+                        <td class="text-warning">${m.expiryDate || 'N/A'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="sendReminderEmail('${m.email}', '${m.username}', ${daysLeft}, '${m.expiryDate}')" class="btn btn-sm btn-outline-warning mb-1 w-100"><i class="fa-solid fa-envelope"></i> Mail</button>
+                            <button onclick="sendWhatsAppReminder('${m.phone}', '${m.username}', ${daysLeft}, '${m.expiryDate}')" class="btn btn-sm btn-success mb-1 w-100"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                            <button onclick="openEditModal(${m.id})" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button onclick="deleteMember(${m.id})" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function quickFilterStatus(status) {
+            showSection('charts-section');
+            document.getElementById('filter-status').value = status;
+            filterMembersTable();
+        }
+
+        function filterMembersTable() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const planFilter = document.getElementById('filter-plan').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            const filtered = allMembersData.filter(m => {
+                const matchesSearch = (m.username && m.username.toLowerCase().includes(query)) ||
+                                      (m.rollNo && m.rollNo.toLowerCase().includes(query)) ||
+                                      (m.email && m.email.toLowerCase().includes(query)) ||
+                                      (m.phone && m.phone.toLowerCase().includes(query));
+
+                const matchesPlan = (planFilter === 'ALL') || (m.subscriptionPlan === planFilter);
+                const matchesStatus = (statusFilter === 'ALL') || (m.calcStatus === statusFilter);
+
+                return matchesSearch && matchesPlan && matchesStatus;
+            });
+
+            renderMembersTable(filtered);
+        }
+
+        function exportToCSV() {
+            if (!allMembersData || allMembersData.length === 0) {
+                alert("No members data available to export!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Roll No,Name,Email,Phone,Address,Gender,Blood Group,Plan,Price,Payment Mode,Expiry Date,Status\n";
+
+            allMembersData.forEach(m => {
+                const row = [
+                    `"${m.rollNo || ''}"`,
+                    `"${m.username || ''}"`,
+                    `"${m.email || ''}"`,
+                    `"${m.phone || ''}"`,
+                    `"${m.address || ''}"`,
+                    `"${m.gender || ''}"`,
+                    `"${m.bloodGroup || ''}"`,
+                    `"${m.subscriptionPlan || ''}"`,
+                    `"${m.price || 0}"`,
+                    `"${m.paymentMode || ''}"`,
+                    `"${m.expiryDate || ''}"`,
+                    `"${m.calcStatus || 'ACTIVE'}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "PulseFit_Members_Database.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function sendReminderEmail(email, name, daysLeft, expiryDate) {
+            if (daysLeft > 7) {
+                alert(`⚠️ Member "${name}" has ${daysLeft} days remaining. Reminders allowed ONLY when <=7 days remain.`);
+                return;
+            }
+
+            const subject = encodeURIComponent("⚠️ PulseFit Gym Subscription Renewal Reminder");
+            let message = daysLeft < 0 
+                ? `Hi ${name},\n\nYour subscription expired ${Math.abs(daysLeft)} days ago on ${expiryDate}.\n\nPlease renew at the earliest.`
+                : `Hi ${name},\n\nYour subscription expires in ${daysLeft} days (${expiryDate}).\n\nPlease renew soon.`;
+
+            window.location.href = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(message)}`;
+        }
+
+        function sendWhatsAppReminder(phone, name, daysLeft, expiryDate) {
+            if (daysLeft > 7) {
+                alert(`⚠️ Member "${name}" has ${daysLeft} days remaining. Reminders allowed ONLY when <=7 days remain.`);
+                return;
+            }
+
+            if (!phone || phone === 'N/A') {
+                alert("📱 Phone number not found!");
+                return;
+            }
+
+            let cleanPhone = phone.replace(/\D/g, '');
+            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+            let msg = daysLeft < 0 
+                ? `Namaste ${name}! 👋\n\nAapki PulseFit Gym membership *${Math.abs(daysLeft)} din pehle (${expiryDate})* expire ho chuki hai. Renew karayein! 💪`
+                : `Namaste ${name}! 👋\n\nAapki PulseFit Gym membership *${daysLeft} din me (${expiryDate})* expire hone wali hai. Renew karayein! 💪`;
+
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function renderChart(planCounts) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Monthly', 'Quarterly', 'Half-Yearly', 'Yearly'],
+                    datasets: [{
+                        label: 'Subscriptions Count',
+                        data: [planCounts['Monthly'], planCounts['Quarterly'], planCounts['Half-Yearly'], planCounts['Yearly']],
+                        backgroundColor: ['#f97316', '#3b82f6', '#10b981', '#a855f7']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#e2e8f0' } },
+                        x: { ticks: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+        }
+
+        async function saveMember(e) {
+            if (e) e.preventDefault();
+            
+            const payload = {
+                username: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                phone: document.getElementById('reg-phone').value,
+                address: document.getElementById('reg-address').value,
+                gender: document.getElementById('reg-gender').value,
+                bloodGroup: document.getElementById('reg-blood').value,
+                subscriptionPlan: document.getElementById('reg-plan').value,
+                price: parseFloat(document.getElementById('reg-price').value),
+                paymentMode: document.getElementById('reg-pay').value,
+                password: "User@" + Math.floor(1000 + Math.random() * 9000)
+            };
+
+            try {
+                const res = await fetch('/api/members', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const savedMember = await res.json();
+                    alert("Member Registered Successfully!");
+
+                    const now = new Date();
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+
+                    document.getElementById('receipt-box').innerHTML = `
+                        <div class="receipt-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="theme-orange fw-bold m-0"><i class="fa-solid fa-dumbbell me-2"></i>PULSEFIT GYM OFFICIAL RECEIPT</h6>
+                                <small class="text-white-50">${now.toLocaleDateString('en-US', options)}</small>
+                            </div>
+                            <hr class="border-secondary my-2">
+                            <div class="row g-2 small">
+                                <div class="col-md-6"><b>Roll No:</b> <span class="theme-orange fw-bold">${savedMember.rollNo || 'Allocated'}</span></div>
+                                <div class="col-md-6"><b>Name:</b> ${payload.username}</div>
+                                <div class="col-md-6"><b>Email:</b> ${payload.email}</div>
+                                <div class="col-md-6"><b>Phone:</b> ${payload.phone}</div>
+                                <div class="col-md-6"><b>Address:</b> ${payload.address}</div>
+                                <div class="col-md-6"><b>Gender / Blood:</b> ${payload.gender} / ${payload.bloodGroup}</div>
+                                <div class="col-md-6"><b>Plan:</b> ${payload.subscriptionPlan} (₹${payload.price})</div>
+                                <div class="col-md-6"><b>Payment Mode:</b> ${payload.paymentMode}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('member-reg-form').reset();
+                    loadAdminDashboard();
+                    showSection('receipt-section');
+                } else {
+                    const errorMsg = await res.text();
+                    alert("Registration Error Details: " + errorMsg);
+                }
+            } catch (err) {
+                console.error("Registration error:", err);
+                alert("Registration failed! Check backend server connection.");
+            }
+        }
+
+        function openEditModal(id) {
+            const member = allMembersData.find(m => m.id === id);
+            if (!member) return;
+
+            document.getElementById('edit-id').value = member.id;
+            document.getElementById('edit-name').value = member.username || '';
+            document.getElementById('edit-email').value = member.email || '';
+            document.getElementById('edit-phone').value = member.phone || '';
+            document.getElementById('edit-address').value = member.address || '';
+            document.getElementById('edit-gender').value = member.gender || 'Male';
+            document.getElementById('edit-blood').value = member.bloodGroup || 'O+';
+            document.getElementById('edit-plan').value = member.subscriptionPlan || 'Monthly';
+            document.getElementById('edit-pay').value = member.paymentMode || 'Online';
+
+            const editModal = new bootstrap.Modal(document.getElementById('editMemberModal'));
+            editModal.show();
+        }
+
+        async function submitEditMember() {
+            const id = document.getElementById('edit-id').value;
+            const rates = { 'Monthly': 1200, 'Quarterly': 3200, 'Half-Yearly': 5500, 'Yearly': 9900 };
+            const plan = document.getElementById('edit-plan').value;
+
+            const payload = {
+                username: document.getElementById('edit-name').value,
+                email: document.getElementById('edit-email').value,
+                phone: document.getElementById('edit-phone').value,
+                address: document.getElementById('edit-address').value,
+                gender: document.getElementById('edit-gender').value,
+                bloodGroup: document.getElementById('edit-blood').value,
+                subscriptionPlan: plan,
+                price: rates[plan] || 0,
+                paymentMode: document.getElementById('edit-pay').value
+            };
+
+            try {
+                const res = await fetch('/api/members/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("Member Details Updated Successfully!");
+                    const modalEl = document.getElementById('editMemberModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                    loadAdminDashboard();
+                } else {
+                    alert("Failed to update member.");
+                }
+            } catch (err) {
+                console.error("Update Error:", err);
+                alert("Error updating member details.");
+            }
+        }
+
+        async function deleteMember(id) {
+            if (confirm("Permanently delete this member? Roll Numbers will automatically re-sequence.")) {
+                await fetch('/api/members/' + id, { method: 'DELETE' });
+                loadAdminDashboard();
+            }
+        }
+
+        function downloadReceiptPDF() {
+            const receiptElement = document.getElementById('printable-receipt');
+            const printBtn = receiptElement.querySelector('.d-print-none');
+            
+            if (printBtn) printBtn.style.display = 'none';
+
+            const opt = {
+                margin:       [10, 10, 10, 10], 
+                filename:     'PulseFit_Gym_Receipt.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#0f172a' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(receiptElement).save().then(() => {
+                if (printBtn) printBtn.style.display = 'inline-block';
+            });
+        }
+    </script>
+</body>
+</html>
