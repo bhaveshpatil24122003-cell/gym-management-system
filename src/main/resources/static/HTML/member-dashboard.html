@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Member Dashboard</title>
+
+    <link rel="stylesheet"
+          href="/CSS/style.css">
+
+</head>
+
+<body>
+
+
+<header class="topbar">
+
+    <div>
+
+        <h2>Gym Management System</h2>
+
+        <span>Member Dashboard</span>
+
+    </div>
+
+
+    <button
+            class="logout-btn"
+            onclick="logout()">
+
+        Logout
+
+    </button>
+
+</header>
+
+
+<main class="container">
+
+
+    <section class="welcome-section">
+
+        <h1>
+            Welcome,
+            <span id="welcomeName">
+                Member
+            </span>
+        </h1>
+
+        <p>
+            View your profile and membership details.
+        </p>
+
+    </section>
+
+
+    <div id="memberMessage"
+         class="message">
+    </div>
+
+
+    <!-- PROFILE -->
+
+    <section class="panel">
+
+        <h2>My Profile</h2>
+
+
+        <div class="profile-grid">
+
+            <div>
+                <span>Member ID</span>
+                <strong id="profileId">-</strong>
+            </div>
+
+
+            <div>
+                <span>Sequence No</span>
+                <strong id="profileSequence">-</strong>
+            </div>
+
+
+            <div>
+                <span>Roll No</span>
+                <strong id="profileRoll">-</strong>
+            </div>
+
+
+            <div>
+                <span>Name</span>
+                <strong id="profileName">-</strong>
+            </div>
+
+
+            <div>
+                <span>Email</span>
+                <strong id="profileEmail">-</strong>
+            </div>
+
+
+            <div>
+                <span>Phone</span>
+                <strong id="profilePhone">-</strong>
+            </div>
+
+
+            <div>
+                <span>Address</span>
+                <strong id="profileAddress">-</strong>
+            </div>
+
+
+            <div>
+                <span>Gender</span>
+                <strong id="profileGender">-</strong>
+            </div>
+
+
+            <div>
+                <span>Blood Group</span>
+                <strong id="profileBlood">-</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MEMBERSHIP -->
+
+    <section class="panel">
+
+        <h2>My Membership</h2>
+
+
+        <div class="profile-grid">
+
+            <div>
+
+                <span>Membership ID</span>
+
+                <strong
+                        id="membershipIdDisplay">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Plan</span>
+
+                <strong
+                        id="membershipPlan">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Price</span>
+
+                <strong
+                        id="membershipPrice">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Registration Date</span>
+
+                <strong
+                        id="registrationDate">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Expiry Date</span>
+
+                <strong
+                        id="expiryDate">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Payment Mode</span>
+
+                <strong
+                        id="paymentModeDisplay">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Status</span>
+
+                <strong
+                        id="membershipStatus">
+                    -
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<script src="/JAVASCRIPT/member.js"></script>
+
+</body>
+</html>

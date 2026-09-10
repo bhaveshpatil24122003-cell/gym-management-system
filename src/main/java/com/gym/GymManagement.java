@@ -7,10 +7,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableAsync // Added to support background email sending
+@EnableAsync 
 public class GymManagement {
 
     public static void main(String[] args) {
         SpringApplication.run(GymManagement.class, args);
     }
-}
+}	
