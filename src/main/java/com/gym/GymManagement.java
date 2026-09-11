@@ -14,3 +14,5 @@ public class GymManagement {
         SpringApplication.run(GymManagement.class, args);
     }
 }	
+
+

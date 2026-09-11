@@ -2,10 +2,6 @@ const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
 
-// ===============================
-// SECURITY CHECK
-// ===============================
-
 if (!token || role !== "ADMIN") {
 
     localStorage.clear();
@@ -14,11 +10,6 @@ if (!token || role !== "ADMIN") {
         "/HTML/login.html";
 
 }
-
-
-// ===============================
-// LOGOUT
-// ===============================
 
 function logout() {
 
@@ -30,11 +21,6 @@ function logout() {
 
 }
 
-
-// ===============================
-// COMMON API FUNCTION
-// ===============================
-
 async function apiRequest(url, options = {}) {
 
     options.headers = {
@@ -45,8 +31,6 @@ async function apiRequest(url, options = {}) {
 
     const response = await fetch(url, options);
 
-
-    // JWT invalid / expired
     if (response.status === 401 ||
         response.status === 403) {
 
@@ -104,10 +88,6 @@ async function apiRequest(url, options = {}) {
 }
 
 
-// ===============================
-// DASHBOARD
-// ===============================
-
 async function loadDashboard() {
 
     try {
@@ -147,10 +127,6 @@ async function loadDashboard() {
 
 }
 
-
-// ===============================
-// MEMBER
-// ===============================
 
 const memberForm =
     document.getElementById("memberForm");
@@ -224,10 +200,6 @@ memberForm.addEventListener(
                     "memberRole"
                 ).value
         };
-
-
-        // Add me password mandatory
-        // Update me optional
 
         if (password.trim() !== "") {
             body.password = password;
@@ -319,10 +291,6 @@ memberForm.addEventListener(
 );
 
 
-// ===============================
-// LOAD MEMBERS
-// ===============================
-
 async function loadMembers() {
 
     try {
@@ -400,11 +368,6 @@ async function loadMembers() {
     }
 
 }
-
-
-// ===============================
-// EDIT MEMBER
-// ===============================
 
 async function editMember(id) {
 
@@ -501,10 +464,6 @@ async function editMember(id) {
 }
 
 
-// ===============================
-// DELETE MEMBER
-// ===============================
-
 async function deleteMember(id) {
 
     const confirmDelete =
@@ -545,11 +504,6 @@ async function deleteMember(id) {
 
 }
 
-
-// ===============================
-// RESET MEMBER FORM
-// ===============================
-
 function resetMemberForm() {
 
     document.getElementById(
@@ -575,10 +529,6 @@ function resetMemberForm() {
 
 }
 
-
-// ===============================
-// MEMBERSHIP FORM
-// ===============================
 
 const membershipForm =
     document.getElementById(
@@ -707,10 +657,6 @@ membershipForm.addEventListener(
 );
 
 
-// ===============================
-// LOAD MEMBERSHIPS
-// ===============================
-
 async function loadMemberships() {
 
     try {
@@ -821,10 +767,6 @@ async function loadMemberships() {
 }
 
 
-// ===============================
-// EDIT MEMBERSHIP
-// ===============================
-
 async function editMembership(id) {
 
     try {
@@ -907,11 +849,6 @@ async function editMembership(id) {
 
 }
 
-
-// ===============================
-// DELETE MEMBERSHIP
-// ===============================
-
 async function deleteMembership(id) {
 
     const confirmDelete =
@@ -953,10 +890,6 @@ async function deleteMembership(id) {
 }
 
 
-// ===============================
-// RESET MEMBERSHIP FORM
-// ===============================
-
 function resetMembershipForm() {
 
     document.getElementById(
@@ -981,10 +914,6 @@ function resetMembershipForm() {
 
 }
 
-
-// ===============================
-// CHECK EXPIRY
-// ===============================
 
 async function checkExpiry() {
 
@@ -1015,10 +944,6 @@ async function checkExpiry() {
 }
 
 
-// ===============================
-// MESSAGE
-// ===============================
-
 function showMessage(
     elementId,
     text,
@@ -1041,11 +966,6 @@ function showMessage(
 
 }
 
-
-// ===============================
-// SAFE HTML
-// ===============================
-
 function safe(value) {
 
     if (value === null ||
@@ -1064,10 +984,6 @@ function safe(value) {
 }
 
 
-// ===============================
-// REFRESH
-// ===============================
-
 async function refreshAll() {
 
     await loadDashboard();
@@ -1076,10 +992,6 @@ async function refreshAll() {
 
 }
 
-
-// ===============================
-// PAGE LOAD
-// ===============================
 
 document.addEventListener(
     "DOMContentLoaded",

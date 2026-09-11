@@ -25,27 +25,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        // Find member using email
         MemberEntity member =
                 memberRepository
                         .findByEmail(email)
                         .orElseThrow(() ->
                                 new UsernameNotFoundException(
                                         "Member not found with email: "
-                                                + email
-                                )
-                        );
+                                                + email));
 
-        // Soft deleted member cannot login
         if (Boolean.TRUE.equals(
                 member.getDeleted())) {
 
             throw new UsernameNotFoundException(
-                    "Member account is deleted"
-            );
+                    "Member account is deleted");
         }
 
-        // Role safety for old database records
         String role = member.getRole();
 
         if (role == null || role.isBlank()) {

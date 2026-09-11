@@ -27,64 +27,47 @@ public class AdminDashboardService {
 
     public AdminDashboardDTO getDashboardStats() {
 
-        // Get all members
         List<MemberEntity> members =
                 memberRepository.findAll();
 
-        // Count only active MEMBER accounts
         long totalMembers = members.stream()
                 .filter(member ->
                         !Boolean.TRUE.equals(
-                                member.getDeleted()
-                        )
-                )
+                                member.getDeleted()))
                 .filter(member ->
                         AppConstants.ROLE_MEMBER
                                 .equalsIgnoreCase(
-                                        member.getRole()
-                                )
-                )
+                                        member.getRole()))
                 .count();
 
-        // Get all memberships
         List<MembershipEntity> memberships =
                 membershipRepository.findAll();
 
-        // Count ACTIVE memberships
         long activeMemberships = memberships.stream()
                 .filter(membership ->
                         AppConstants.STATUS_ACTIVE
                                 .equalsIgnoreCase(
-                                        membership.getStatus()
-                                )
-                )
+                                        membership.getStatus()))
                 .count();
 
-        // Count EXPIRED memberships
         long expiredMemberships = memberships.stream()
                 .filter(membership ->
                         AppConstants.STATUS_EXPIRED
                                 .equalsIgnoreCase(
-                                        membership.getStatus()
-                                )
-                )
+                                        membership.getStatus()))
                 .count();
 
-        // Calculate total revenue
         double totalRevenue = memberships.stream()
                 .filter(membership ->
-                        membership.getPrice() != null
-                )
+                        membership.getPrice() != null)
                 .mapToDouble(
-                        MembershipEntity::getPrice
-                )
+                        MembershipEntity::getPrice)
                 .sum();
 
         return new AdminDashboardDTO(
                 totalMembers,
                 activeMemberships,
                 expiredMemberships,
-                totalRevenue
-        );
+                totalRevenue);
     }
 }

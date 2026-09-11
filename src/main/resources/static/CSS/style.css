@@ -10,11 +10,6 @@ body {
     color: #252525;
 }
 
-
-/* =========================
-   LOGIN
-========================= */
-
 .login-body {
     min-height: 100vh;
     display: flex;
@@ -66,11 +61,6 @@ body {
     font-size: 20px;
 }
 
-
-/* =========================
-   TOP BAR
-========================= */
-
 .topbar {
     background: #172033;
     color: white;
@@ -90,11 +80,6 @@ body {
     font-size: 14px;
 }
 
-
-/* =========================
-   MAIN
-========================= */
-
 .container {
     width: 92%;
     max-width: 1450px;
@@ -108,11 +93,6 @@ body {
 .welcome-section h1 {
     margin-bottom: 8px;
 }
-
-
-/* =========================
-   DASHBOARD CARDS
-========================= */
 
 .dashboard-cards {
     display: grid;
@@ -141,11 +121,6 @@ body {
     color: #172033;
 }
 
-
-/* =========================
-   PANEL
-========================= */
-
 .panel {
     background: white;
     padding: 25px;
@@ -163,11 +138,6 @@ body {
     align-items: center;
     justify-content: space-between;
 }
-
-
-/* =========================
-   FORMS
-========================= */
 
 .form-grid {
     display: grid;
@@ -206,11 +176,6 @@ body {
     gap: 12px;
     margin-top: 10px;
 }
-
-
-/* =========================
-   BUTTONS
-========================= */
 
 button {
     border: none;
@@ -266,10 +231,6 @@ button:hover {
 }
 
 
-/* =========================
-   TABLE
-========================= */
-
 .table-container {
     overflow-x: auto;
 }
@@ -302,10 +263,6 @@ tbody tr:hover {
 }
 
 
-/* =========================
-   STATUS
-========================= */
-
 .status {
     display: inline-block;
     padding: 5px 10px;
@@ -324,10 +281,6 @@ tbody tr:hover {
     color: #721c24;
 }
 
-
-/* =========================
-   PROFILE
-========================= */
 
 .profile-grid {
     display: grid;
@@ -354,10 +307,6 @@ tbody tr:hover {
 }
 
 
-/* =========================
-   MESSAGES
-========================= */
-
 .message {
     margin-top: 15px;
     font-size: 14px;
@@ -371,10 +320,6 @@ tbody tr:hover {
     color: #dc3545;
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
 
 @media (max-width: 1000px) {
 

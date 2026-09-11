@@ -13,6 +13,7 @@ import com.gym.exception.ResourceNotFoundException;
 import com.gym.mapper.MembershipMapper;
 import com.gym.repository.MemberRepository;
 import com.gym.repository.MembershipRepository;
+import com.gym.service.EmailService;
 import com.gym.service.MembershipService;
 import com.gym.util.AppConstants;
 
@@ -21,19 +22,18 @@ public class MembershipServiceImpl implements MembershipService {
 
     private final MembershipRepository membershipRepository;
     private final MemberRepository memberRepository;
+    private final EmailService emailService;
 
     public MembershipServiceImpl(
             MembershipRepository membershipRepository,
-            MemberRepository memberRepository) {
+            MemberRepository memberRepository,
+            EmailService emailService) {
 
         this.membershipRepository = membershipRepository;
         this.memberRepository = memberRepository;
+        this.emailService = emailService;
     }
 
-
-    // =========================
-    // ADD MEMBERSHIP
-    // =========================
     @Override
     public MembershipDTO addMembership(
             Long memberId,
@@ -43,18 +43,14 @@ public class MembershipServiceImpl implements MembershipService {
                 .findById(memberId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Member not found with id: " + memberId
-                        )
-                );
+                                "Member not found with id: " + memberId));
 
-        // Same member cannot have two memberships
         if (membershipRepository
                 .findByMemberId(memberId)
                 .isPresent()) {
 
             throw new DuplicateResourceException(
-                    "Membership already exists for this member"
-            );
+                    "Membership already exists for this member");
         }
 
         MembershipEntity membership =
@@ -78,26 +74,25 @@ public class MembershipServiceImpl implements MembershipService {
         membership.setExpiryDate(
                 calculateExpiryDate(
                         registrationDate,
-                        dto.getSubscriptionPlan()
-                )
-        );
+                        dto.getSubscriptionPlan()));
 
         membership.setStatus(
-                AppConstants.STATUS_ACTIVE
-        );
+                AppConstants.STATUS_ACTIVE);
 
         membership.setMember(member);
 
         MembershipEntity savedMembership =
                 membershipRepository.save(membership);
 
-        return MembershipMapper.toDTO(savedMembership);
+        // Membership save hone ke baad receipt email send hoga
+        emailService.sendMembershipReceipt(
+                member,
+                savedMembership);
+
+        return MembershipMapper.toDTO(
+                savedMembership);
     }
 
-
-    // =========================
-    // GET ALL MEMBERSHIPS
-    // =========================
     @Override
     public List<MembershipDTO> getAllMemberships() {
 
@@ -108,10 +103,6 @@ public class MembershipServiceImpl implements MembershipService {
                 .toList();
     }
 
-
-    // =========================
-    // GET MEMBERSHIP BY MEMBER ID
-    // =========================
     @Override
     public MembershipDTO getMembershipByMemberId(
             Long memberId) {
@@ -122,18 +113,12 @@ public class MembershipServiceImpl implements MembershipService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Membership not found for member id: "
-                                                + memberId
-                                )
-                        );
+                                                + memberId));
 
-        return MembershipMapper.toDTO(membership);
+        return MembershipMapper.toDTO(
+                membership);
     }
 
-
-    // =========================
-    // GET LOGGED-IN MEMBER
-    // MEMBERSHIP
-    // =========================
     @Override
     public MembershipDTO getMyMembership(
             String email) {
@@ -143,16 +128,13 @@ public class MembershipServiceImpl implements MembershipService {
                         .findByEmail(email)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Member not found"
-                                )
-                        );
+                                        "Member not found"));
 
         if (Boolean.TRUE.equals(
                 member.getDeleted())) {
 
             throw new ResourceNotFoundException(
-                    "Member account is deleted"
-            );
+                    "Member account is deleted");
         }
 
         MembershipEntity membership =
@@ -160,17 +142,12 @@ public class MembershipServiceImpl implements MembershipService {
                         .findByMemberId(member.getId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Membership not found for this member"
-                                )
-                        );
+                                        "Membership not found for this member"));
 
-        return MembershipMapper.toDTO(membership);
+        return MembershipMapper.toDTO(
+                membership);
     }
 
-
-    // =========================
-    // UPDATE MEMBERSHIP
-    // =========================
     @Override
     public MembershipDTO updateMembership(
             Long membershipId,
@@ -182,9 +159,7 @@ public class MembershipServiceImpl implements MembershipService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Membership not found with id: "
-                                                + membershipId
-                                )
-                        );
+                                                + membershipId));
 
         membership.setSubscriptionPlan(
                 dto.getSubscriptionPlan());
@@ -198,26 +173,18 @@ public class MembershipServiceImpl implements MembershipService {
         membership.setExpiryDate(
                 calculateExpiryDate(
                         membership.getRegistrationDate(),
-                        dto.getSubscriptionPlan()
-                )
-        );
+                        dto.getSubscriptionPlan()));
 
         membership.setStatus(
-                AppConstants.STATUS_ACTIVE
-        );
+                AppConstants.STATUS_ACTIVE);
 
         MembershipEntity updatedMembership =
                 membershipRepository.save(membership);
 
         return MembershipMapper.toDTO(
-                updatedMembership
-        );
+                updatedMembership);
     }
 
-
-    // =========================
-    // DELETE MEMBERSHIP
-    // =========================
     @Override
     public void deleteMembership(
             Long membershipId) {
@@ -228,17 +195,12 @@ public class MembershipServiceImpl implements MembershipService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Membership not found with id: "
-                                                + membershipId
-                                )
-                        );
+                                                + membershipId));
 
-        membershipRepository.delete(membership);
+        membershipRepository.delete(
+                membership);
     }
 
-
-    // =========================
-    // CALCULATE EXPIRY DATE
-    // =========================
     private LocalDate calculateExpiryDate(
             LocalDate registrationDate,
             String plan) {
@@ -266,8 +228,7 @@ public class MembershipServiceImpl implements MembershipService {
         } else {
 
             throw new IllegalArgumentException(
-                    "Invalid subscription plan"
-            );
+                    "Invalid subscription plan");
         }
     }
 }

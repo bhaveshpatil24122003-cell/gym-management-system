@@ -8,25 +8,20 @@ public interface MembershipService {
 
     MembershipDTO addMembership(
             Long memberId,
-            MembershipDTO dto
-    );
+            MembershipDTO dto);
 
     List<MembershipDTO> getAllMemberships();
 
     MembershipDTO getMembershipByMemberId(
-            Long memberId
-    );
+            Long memberId);
 
     MembershipDTO getMyMembership(
-            String email
-    );
+            String email);
 
     MembershipDTO updateMembership(
             Long membershipId,
-            MembershipDTO dto
-    );
+            MembershipDTO dto);
 
     void deleteMembership(
-            Long membershipId
-    );
+            Long membershipId);
 }

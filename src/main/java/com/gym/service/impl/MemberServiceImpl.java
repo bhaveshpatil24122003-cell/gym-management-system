@@ -29,13 +29,9 @@ public class MemberServiceImpl implements MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // =========================
-    // ADD MEMBER
-    // =========================
     @Override
     public MemberDTO addMember(MemberRequestDTO dto) {
 
-        // Check duplicate email
         if (memberRepository.existsByEmail(dto.getEmail())) {
 
             throw new DuplicateResourceException(
@@ -43,7 +39,6 @@ public class MemberServiceImpl implements MemberService {
             );
         }
 
-        // Password is compulsory while creating member
         if (dto.getPassword() == null ||
                 dto.getPassword().isBlank()) {
 
@@ -63,20 +58,15 @@ public class MemberServiceImpl implements MemberService {
         member.setGender(dto.getGender());
         member.setBloodGroup(dto.getBloodGroup());
 
-        // Encrypt password using BCrypt
         member.setPassword(
                 passwordEncoder.encode(
-                        dto.getPassword()
-                )
-        );
+                        dto.getPassword()));
 
-        // Default role = MEMBER
         if (dto.getRole() == null ||
                 dto.getRole().isBlank()) {
 
             member.setRole(
-                    AppConstants.ROLE_MEMBER
-            );
+                    AppConstants.ROLE_MEMBER);
 
         } else {
 
@@ -91,9 +81,7 @@ public class MemberServiceImpl implements MemberService {
         return MemberMapper.toDTO(savedMember);
     }
 
-    // =========================
-    // GET ALL MEMBERS
-    // =========================
+
     @Override
     public List<MemberDTO> getAllMembers() {
 
@@ -102,16 +90,11 @@ public class MemberServiceImpl implements MemberService {
                 .stream()
                 .filter(member ->
                         !Boolean.TRUE.equals(
-                                member.getDeleted()
-                        )
-                )
+                                member.getDeleted()))
                 .map(MemberMapper::toDTO)
                 .toList();
     }
 
-    // =========================
-    // GET MEMBER BY ID
-    // =========================
     @Override
     public MemberDTO getMemberById(Long id) {
 
@@ -120,16 +103,11 @@ public class MemberServiceImpl implements MemberService {
                         .findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Member not found with id: " + id
-                                )
-                        );
+                                        "Member not found with id: " + id));
 
         return MemberMapper.toDTO(member);
     }
 
-    // =========================
-    // GET MEMBER BY EMAIL
-    // =========================
     @Override
     public MemberDTO getMemberByEmail(String email) {
 
@@ -138,24 +116,18 @@ public class MemberServiceImpl implements MemberService {
                         .findByEmail(email)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Member not found"
-                                )
-                        );
+                                        "Member not found"));
 
         if (Boolean.TRUE.equals(
                 member.getDeleted())) {
 
             throw new ResourceNotFoundException(
-                    "Member account is deleted"
-            );
+                    "Member account is deleted");
         }
 
         return MemberMapper.toDTO(member);
     }
 
-    // =========================
-    // UPDATE MEMBER
-    // =========================
     @Override
     public MemberDTO updateMember(
             Long id,
@@ -166,19 +138,15 @@ public class MemberServiceImpl implements MemberService {
                         .findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Member not found with id: " + id
-                                )
-                        );
+                                        "Member not found with id: " + id));
 
-        // Check duplicate email
         if (!member.getEmail()
                 .equalsIgnoreCase(dto.getEmail())
                 && memberRepository
                         .existsByEmail(dto.getEmail())) {
 
             throw new DuplicateResourceException(
-                    "Email already registered"
-            );
+                    "Email already registered");
         }
 
         member.setSequenceNo(dto.getSequenceNo());
@@ -190,18 +158,14 @@ public class MemberServiceImpl implements MemberService {
         member.setGender(dto.getGender());
         member.setBloodGroup(dto.getBloodGroup());
 
-        // Password optional during update
         if (dto.getPassword() != null &&
                 !dto.getPassword().isBlank()) {
 
             member.setPassword(
                     passwordEncoder.encode(
-                            dto.getPassword()
-                    )
-            );
+                            dto.getPassword()));
         }
 
-        // Update role only when provided
         if (dto.getRole() != null &&
                 !dto.getRole().isBlank()) {
 
@@ -214,9 +178,6 @@ public class MemberServiceImpl implements MemberService {
         return MemberMapper.toDTO(updatedMember);
     }
 
-    // =========================
-    // SOFT DELETE MEMBER
-    // =========================
     @Override
     public void deleteMember(Long id) {
 
@@ -225,9 +186,7 @@ public class MemberServiceImpl implements MemberService {
                         .findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Member not found with id: " + id
-                                )
-                        );
+                                        "Member not found with id: " + id));
 
         member.setDeleted(true);
 

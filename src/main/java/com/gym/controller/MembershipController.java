@@ -33,10 +33,6 @@ public class MembershipController {
         this.membershipExpiryScheduler = membershipExpiryScheduler;
     }
 
-    // =========================
-    // ADD MEMBERSHIP
-    // ADMIN ONLY
-    // =========================
     @PostMapping("/member/{memberId}")
     public MembershipDTO addMembership(
             @PathVariable Long memberId,
@@ -44,14 +40,9 @@ public class MembershipController {
 
         return membershipService.addMembership(
                 memberId,
-                membershipDTO
-        );
+                membershipDTO);
     }
 
-    // =========================
-    // GET MY MEMBERSHIP
-    // MEMBER / ADMIN
-    // =========================
     @GetMapping("/me")
     public MembershipDTO getMyMembership(
             Authentication authentication) {
@@ -62,10 +53,6 @@ public class MembershipController {
                 .getMyMembership(email);
     }
 
-    // =========================
-    // MANUAL EXPIRY CHECK
-    // ADMIN ONLY
-    // =========================
     @PutMapping("/check-expiry")
     public String checkMembershipExpiry() {
 
@@ -75,10 +62,6 @@ public class MembershipController {
         return "Membership expiry checked successfully";
     }
 
-    // =========================
-    // GET ALL MEMBERSHIPS
-    // ADMIN ONLY
-    // =========================
     @GetMapping
     public List<MembershipDTO> getAllMemberships() {
 
@@ -86,10 +69,6 @@ public class MembershipController {
                 .getAllMemberships();
     }
 
-    // =========================
-    // GET MEMBERSHIP BY MEMBER ID
-    // ADMIN ONLY
-    // =========================
     @GetMapping("/member/{memberId}")
     public MembershipDTO getMembershipByMemberId(
             @PathVariable Long memberId) {
@@ -98,10 +77,6 @@ public class MembershipController {
                 .getMembershipByMemberId(memberId);
     }
 
-    // =========================
-    // UPDATE MEMBERSHIP
-    // ADMIN ONLY
-    // =========================
     @PutMapping("/{membershipId}")
     public MembershipDTO updateMembership(
             @PathVariable Long membershipId,
@@ -110,14 +85,9 @@ public class MembershipController {
         return membershipService
                 .updateMembership(
                         membershipId,
-                        membershipDTO
-                );
+                        membershipDTO);
     }
 
-    // =========================
-    // DELETE MEMBERSHIP
-    // ADMIN ONLY
-    // =========================
     @DeleteMapping("/{membershipId}")
     public String deleteMembership(
             @PathVariable Long membershipId) {

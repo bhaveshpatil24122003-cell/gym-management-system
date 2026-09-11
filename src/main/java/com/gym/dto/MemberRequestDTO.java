@@ -29,8 +29,7 @@ public class MemberRequestDTO {
     @NotBlank(message = "Phone number is required")
     @Pattern(
         regexp = "^[0-9]{10}$",
-        message = "Phone number must be 10 digits"
-    )
+        message = "Phone number must be 10 digits")
     private String phone;
 
     @NotBlank(message = "Gender is required")
@@ -39,12 +38,9 @@ public class MemberRequestDTO {
     @NotBlank(message = "Blood group is required")
     private String bloodGroup;
 
-    // Create me required hoga.
-    // Update me optional rahega.
     @Size(
         min = 6,
-        message = "Password must be at least 6 characters"
-    )
+        message = "Password must be at least 6 characters")
     private String password;
 
     private String role;

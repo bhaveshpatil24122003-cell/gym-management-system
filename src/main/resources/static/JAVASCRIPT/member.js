@@ -2,10 +2,6 @@ const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
 
-// ===============================
-// SECURITY
-// ===============================
-
 if (!token || role !== "MEMBER") {
 
     localStorage.clear();
@@ -15,10 +11,6 @@ if (!token || role !== "MEMBER") {
 
 }
 
-
-// ===============================
-// LOGOUT
-// ===============================
 
 function logout() {
 
@@ -30,10 +22,6 @@ function logout() {
 
 }
 
-
-// ===============================
-// DASHBOARD API
-// ===============================
 
 async function loadMemberDashboard() {
 
@@ -107,11 +95,6 @@ async function loadMemberDashboard() {
 
 }
 
-
-// ===============================
-// PROFILE
-// ===============================
-
 function displayProfile(profile) {
 
     if (!profile) {
@@ -181,10 +164,6 @@ function displayProfile(profile) {
 }
 
 
-// ===============================
-// MEMBERSHIP
-// ===============================
-
 function displayMembership(membership) {
 
     if (!membership) {
@@ -253,10 +232,6 @@ function displayMembership(membership) {
 }
 
 
-// ===============================
-// SAFE TEXT
-// ===============================
-
 function setText(id, value) {
 
     document.getElementById(
@@ -267,10 +242,6 @@ function setText(id, value) {
 
 }
 
-
-// ===============================
-// PAGE START
-// ===============================
 
 document.addEventListener(
     "DOMContentLoaded",

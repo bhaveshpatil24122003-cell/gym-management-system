@@ -43,14 +43,11 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()) );
 
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(
-                        loginRequest.getEmail()
-                );
+                        loginRequest.getEmail());
 
         String token =
                 jwtService.generateToken(userDetails);
@@ -63,7 +60,6 @@ public class AuthController {
         return new LoginResponse(
                 token,
                 member.getRole(),
-                "Login successful"
-        );
+                "Login successful");
     }
 }

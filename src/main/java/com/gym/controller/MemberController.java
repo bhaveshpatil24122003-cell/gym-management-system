@@ -28,11 +28,6 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-
-    // =========================
-    // ADD MEMBER
-    // ADMIN ONLY
-    // =========================
     @PostMapping
     public MemberDTO addMember(
             @Valid @RequestBody MemberRequestDTO memberDTO) {
@@ -40,21 +35,12 @@ public class MemberController {
         return memberService.addMember(memberDTO);
     }
 
-
-    // =========================
-    // GET ALL MEMBERS
-    // ADMIN ONLY
-    // =========================
     @GetMapping
     public List<MemberDTO> getAllMembers() {
 
         return memberService.getAllMembers();
     }
 
-
-    // =========================
-    // GET LOGGED-IN MEMBER PROFILE
-    // =========================
     @GetMapping("/me")
     public MemberDTO getMyProfile(
             Authentication authentication) {
@@ -64,11 +50,6 @@ public class MemberController {
         return memberService.getMemberByEmail(email);
     }
 
-
-    // =========================
-    // GET MEMBER BY ID
-    // ADMIN ONLY
-    // =========================
     @GetMapping("/{id}")
     public MemberDTO getMemberById(
             @PathVariable Long id) {
@@ -76,11 +57,6 @@ public class MemberController {
         return memberService.getMemberById(id);
     }
 
-
-    // =========================
-    // UPDATE MEMBER
-    // ADMIN ONLY
-    // =========================
     @PutMapping("/{id}")
     public MemberDTO updateMember(
             @PathVariable Long id,
@@ -89,11 +65,6 @@ public class MemberController {
         return memberService.updateMember(id, memberDTO);
     }
 
-
-    // =========================
-    // SOFT DELETE MEMBER
-    // ADMIN ONLY
-    // =========================
     @DeleteMapping("/{id}")
     public String deleteMember(
             @PathVariable Long id) {

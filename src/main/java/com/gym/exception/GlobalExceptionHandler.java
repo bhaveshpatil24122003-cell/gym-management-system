@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // =========================
-    // RESOURCE NOT FOUND
-    // 404
-    // =========================
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFound(
             ResourceNotFoundException ex) {
@@ -27,15 +23,9 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(
                 response,
-                HttpStatus.NOT_FOUND
-        );
+                HttpStatus.NOT_FOUND);
     }
 
-
-    // =========================
-    // DUPLICATE RESOURCE
-    // 409
-    // =========================
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateResource(
             DuplicateResourceException ex) {
@@ -47,15 +37,9 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(
                 response,
-                HttpStatus.CONFLICT
-        );
+                HttpStatus.CONFLICT);
     }
 
-
-    // =========================
-    // VALIDATION ERROR
-    // 400
-    // =========================
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(
             MethodArgumentNotValidException ex) {
@@ -67,21 +51,14 @@ public class GlobalExceptionHandler {
                 .forEach(error ->
                         errors.put(
                                 error.getField(),
-                                error.getDefaultMessage()
-                        )
-                );
+                                error.getDefaultMessage()));
 
         return new ResponseEntity<>(
                 errors,
-                HttpStatus.BAD_REQUEST
-        );
+                HttpStatus.BAD_REQUEST);
     }
 
 
-    // =========================
-    // RUNTIME ERROR
-    // 400
-    // =========================
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(
             RuntimeException ex) {
@@ -93,15 +70,9 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(
                 response,
-                HttpStatus.BAD_REQUEST
-        );
+                HttpStatus.BAD_REQUEST);
     }
 
-
-    // =========================
-    // OTHER ERROR
-    // 500
-    // =========================
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleAllExceptions(
             Exception ex) {
@@ -111,12 +82,10 @@ public class GlobalExceptionHandler {
         response.put("status", "Error");
         response.put(
                 "message",
-                "Something went wrong. Please try again."
-        );
+                "Something went wrong. Please try again.");
 
         return new ResponseEntity<>(
                 response,
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

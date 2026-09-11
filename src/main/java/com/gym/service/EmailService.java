@@ -1,5 +1,6 @@
 package com.gym.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -15,44 +16,66 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${MAIL_USERNAME}")
+    private String mailUsername;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
     @Async
-    public void sendReceiptAndDietEmail(
+    public void sendMembershipReceipt(
             MemberEntity member,
-            MembershipEntity membership,
-            String plainPassword) {
+            MembershipEntity membership) {
 
         try {
 
-            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessage message =
+                    mailSender.createMimeMessage();
 
             MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+                    new MimeMessageHelper(
+                            message,
+                            true,
+                            "UTF-8");
 
-            helper.setFrom("bhaveshpatil24122003@gmail.com");
-            helper.setTo(member.getEmail());
+            helper.setFrom(mailUsername);
+
+            helper.setTo(
+                    member.getEmail());
 
             helper.setSubject(
-                    "Welcome to PulseFit Gym - Receipt & Training Program");
+                    "PulseFit Gym - Membership Receipt");
 
             String html =
                     "<div style='font-family:Arial;padding:25px;'>"
 
                     + "<h1>PulseFit Gym</h1>"
 
-                    + "<p>Hi <b>"
+                    + "<p>Hello <b>"
                     + member.getUsername()
-                    + "</b>, Welcome to the family!</p>"
+                    + "</b>,</p>"
 
-                    + "<h3>Payment Receipt</h3>"
+                    + "<p>Your gym membership has been activated successfully.</p>"
+
+                    + "<h3>Membership Receipt</h3>"
 
                     + "<ul>"
 
+                    + "<li><b>Member ID:</b> "
+                    + member.getId()
+                    + "</li>"
+
                     + "<li><b>Roll No:</b> "
                     + member.getRollNo()
+                    + "</li>"
+
+                    + "<li><b>Name:</b> "
+                    + member.getUsername()
+                    + "</li>"
+
+                    + "<li><b>Email:</b> "
+                    + member.getEmail()
                     + "</li>"
 
                     + "<li><b>Plan:</b> "
@@ -71,26 +94,19 @@ public class EmailService {
                     + membership.getRegistrationDate()
                     + "</li>"
 
-                    + "<li><b>Valid Till:</b> "
+                    + "<li><b>Expiry Date:</b> "
                     + membership.getExpiryDate()
+                    + "</li>"
+
+                    + "<li><b>Status:</b> "
+                    + membership.getStatus()
                     + "</li>"
 
                     + "</ul>"
 
-                    + "<h3>Portal Login</h3>"
+                    + "<p>Thank you for choosing PulseFit Gym.</p>"
 
-                    + "<p><b>Email:</b> "
-                    + member.getEmail()
-                    + "</p>"
-
-                    + "<p><b>Temporary Password:</b> "
-                    + plainPassword
-                    + "</p>"
-
-                    + "<h3>Diet Guidelines</h3>"
-
-                    + "<p>Follow your assigned training and diet program "
-                    + "according to your fitness goal.</p>"
+                    + "<p><b>Stay Fit, Stay Strong!</b></p>"
 
                     + "</div>";
 
@@ -99,14 +115,16 @@ public class EmailService {
             mailSender.send(message);
 
             System.out.println(
-                    "Email sent successfully to: "
+                    "Membership receipt sent successfully to: "
                     + member.getEmail());
 
         } catch (Exception e) {
 
             System.err.println(
-                    "Email sending failed: "
+                    "Membership email failed: "
                     + e.getMessage());
+
+            e.printStackTrace();
         }
     }
 }

@@ -1,7 +1,6 @@
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 
-// Agar already login hai to correct dashboard par bhejo
 const existingToken = localStorage.getItem("token");
 const existingRole = localStorage.getItem("role");
 
@@ -49,8 +48,7 @@ loginForm.addEventListener("submit", async function (event) {
         if (!response.ok) {
             throw new Error(data.message || "Invalid email or password");
         }
-
-        // JWT store
+		
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
 

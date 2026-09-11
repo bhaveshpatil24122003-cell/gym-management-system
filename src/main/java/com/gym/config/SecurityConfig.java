@@ -40,15 +40,10 @@ public class SecurityConfig {
 
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
-            )
+                    SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(auth -> auth
 
-                // =========================
-                // PUBLIC
-                // =========================
                 .requestMatchers("/auth/**")
                 .permitAll()
 
@@ -57,124 +52,78 @@ public class SecurityConfig {
                     "/index.html",
                     "/HTML/**",
                     "/CSS/**",
-                    "/JAVASCRIPT/**"
-                )
+                    "/JAVASCRIPT/**")
                 .permitAll()
 
-
-                // =========================
-                // MEMBER DASHBOARD
-                // MEMBER + ADMIN
-                // =========================
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/dashboard/me"
-                )
+                    "/dashboard/me")
                 .hasAnyRole("MEMBER", "ADMIN")
 
-
-                // =========================
-                // ADMIN DASHBOARD
-                // ADMIN ONLY
-                // =========================
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/dashboard/admin"
-                )
+                    "/dashboard/admin")
                 .hasRole("ADMIN")
 
-
-                // =========================
-                // OWN MEMBER PROFILE
-                // =========================
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/members/me"
-                )
+                    "/members/me")
                 .hasAnyRole("MEMBER", "ADMIN")
 
-
-                // =========================
-                // OWN MEMBERSHIP
-                // =========================
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/memberships/me"
-                )
+                    "/memberships/me")
                 .hasAnyRole("MEMBER", "ADMIN")
 
-
-                // =========================
-                // MEMBER CRUD
-                // ADMIN ONLY
-                // =========================
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/members/**"
-                )
+                    "/members/**")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.POST,
-                    "/members"
-                )
+                    "/members")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.PUT,
-                    "/members/**"
-                )
+                    "/members/**")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.DELETE,
-                    "/members/**"
-                )
+                    "/members/**")
                 .hasRole("ADMIN")
-
-
-                // =========================
-                // MEMBERSHIP CRUD
-                // ADMIN ONLY
-                // =========================
+                
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/memberships/**"
-                )
+                    "/memberships/**")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.POST,
-                    "/memberships/**"
-                )
+                    "/memberships/**")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.PUT,
-                    "/memberships/**"
-                )
+                    "/memberships/**")
                 .hasRole("ADMIN")
 
                 .requestMatchers(
                     HttpMethod.DELETE,
-                    "/memberships/**"
-                )
+                    "/memberships/**")
                 .hasRole("ADMIN")
 
-
-                // Other requests require login
                 .anyRequest()
-                .authenticated()
-            )
+                .authenticated())
 
             .authenticationProvider(
-                authenticationProvider()
-            )
+                authenticationProvider())
 
             .addFilterBefore(
                 jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -189,12 +138,10 @@ public class SecurityConfig {
 
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider(
-                        userDetailsService
-                );
+                        userDetailsService);
 
         provider.setPasswordEncoder(
-                passwordEncoder()
-        );
+                passwordEncoder());
 
         return provider;
     }

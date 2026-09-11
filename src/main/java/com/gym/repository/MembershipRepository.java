@@ -17,6 +17,5 @@ public interface MembershipRepository
 
     List<MembershipEntity> findByExpiryDateBeforeAndStatus(
             LocalDate date,
-            String status
-    );
+            String status);
 }

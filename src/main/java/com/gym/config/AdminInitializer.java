@@ -14,6 +14,12 @@ public class AdminInitializer implements CommandLineRunner {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${ADMIN_NAME}")
+    private String adminName;
+
+    @Value("${ADMIN_EMAIL}")
+    private String adminEmail;
+
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;
 
@@ -28,20 +34,18 @@ public class AdminInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        String adminEmail = "admin@pulsefit.com";
-
         if (memberRepository.findByEmail(adminEmail).isEmpty()) {
 
             MemberEntity admin = new MemberEntity();
 
-            admin.setSequenceNo(0);
+            admin.setSequenceNo(1);
             admin.setRollNo("ADMIN001");
-            admin.setUsername("PulseFit Admin");
+            admin.setUsername(adminName);
             admin.setAddress("PulseFit Gym");
             admin.setEmail(adminEmail);
-            admin.setPhone("9999999999");
+            admin.setPhone("8767754615");
             admin.setGender("Male");
-            admin.setBloodGroup("N/A");
+            admin.setBloodGroup("O+");
 
             admin.setPassword(
                     passwordEncoder.encode(adminPassword));

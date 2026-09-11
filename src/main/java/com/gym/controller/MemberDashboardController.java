@@ -20,9 +20,6 @@ public class MemberDashboardController {
         this.memberDashboardService = memberDashboardService;
     }
 
-    // =========================
-    // GET LOGGED-IN MEMBER DASHBOARD
-    // =========================
     @GetMapping("/me")
     public MemberDashboardDTO getMyDashboard(
             Authentication authentication) {
